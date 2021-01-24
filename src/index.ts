@@ -5,14 +5,26 @@ const boardElement = document.getElementById("board");
 const ROW_COUNT = 3;
 const COL_COUNT = 3;
 
-let boardState = [
-  ["", "", ""],
-  ["", "", ""],
-  ["", "", ""]
-];
-let currentMove = "X";
+type Players = "X" | "Y";
+type Cell = Players | "";
 
-function createCell(row, col, content = "") {
+type TicTacToeBoard = [
+  [Cell, Cell, Cell],
+  [Cell, Cell, Cell],
+  [Cell, Cell, Cell]
+];
+let boardState: TicTacToeBoard = [
+  ["", "", ""],
+  ["", "", ""],
+  ["", "", ""],
+];
+let currentMove: Players = "X";
+
+function createCell(
+  row: number,
+  col: number,
+  content: Cell = ""
+): HTMLButtonElement {
   const cell = document.createElement("button");
   cell.setAttribute("data-row", row.toString());
   cell.setAttribute("data-col", col.toString());
@@ -21,7 +33,7 @@ function createCell(row, col, content = "") {
   return cell;
 }
 
-function renderBoard() {
+function renderBoard(): void {
   if (!appElement) throw new Error("Cannot find app");
   if (!boardElement) throw new Error("Cannot find board");
   boardElement.innerHTML = "";
@@ -41,14 +53,14 @@ function renderBoard() {
   appElement.insertBefore(moveElement, document.getElementById("reset"));
 }
 
-function init() {
+function init(): void {
   const resetButton = document.getElementById("reset");
   if (!resetButton) throw new Error("No Reset button");
   resetButton.addEventListener("click", () => {
     boardState = [
       ["", "", ""],
       ["", "", ""],
-      ["", "", ""]
+      ["", "", ""],
     ];
     currentMove = "X";
     renderBoard();
