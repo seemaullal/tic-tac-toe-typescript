@@ -2,6 +2,7 @@ import "./style.css";
 
 const appElement = document.getElementById("app");
 const boardElement = document.getElementById("board");
+const statusElement = document.getElementById("game-status");
 const ROW_COUNT = 3;
 const COL_COUNT = 3;
 
@@ -19,6 +20,8 @@ let boardState: TicTacToeBoard = [
   ["", "", ""],
 ];
 let currentMove: Players = "X";
+let winner: Cell | undefined;
+let draw: boolean = false;
 
 function createCell(
   row: number,
@@ -38,7 +41,7 @@ function createCell(
     }
     rowNumber = Number(rowNumber);
     colNumber = Number(colNumber);
-    if (boardState[rowNumber][colNumber] === "") {
+    if (boardState[rowNumber][colNumber] === "" && !winner && !draw) {
       boardState[rowNumber][colNumber] = currentMove;
       currentMove = currentMove === "X" ? "O" : "X";
       renderBoard();
@@ -47,10 +50,41 @@ function createCell(
   return cell;
 }
 
+function getGameStatus(): string {
+  if (winner) {
+    return `${winner} wins!`;
+  } else if (draw) {
+    return "Draw";
+  }
+  let potentialDraw: boolean = true;
+  for (let i = 0; i < ROW_COUNT; i++) {
+    if (
+      boardState[i][0] == "" ||
+      boardState[i][1] === "" ||
+      boardState[i][2] === ""
+    ) {
+      potentialDraw = false;
+    } else if (
+      boardState[i][0] === boardState[i][1] &&
+      boardState[i][1] === boardState[i][2]
+    ) {
+      winner = boardState[i][0];
+    }
+  }
+  if (winner) return `${winner} wins!`;
+  if (potentialDraw) {
+    draw = true;
+    return "Draw";
+  }
+  return "";
+}
+
 function renderBoard(): void {
   if (!appElement) throw new Error("Cannot find app");
   if (!boardElement) throw new Error("Cannot find board");
+  if (!statusElement) throw new Error("Cannot find status");
   boardElement.innerHTML = "";
+  statusElement.innerText = getGameStatus();
   for (let i = 0; i < ROW_COUNT; i++) {
     for (let j = 0; j < COL_COUNT; j++) {
       boardElement.appendChild(createCell(i, j, boardState[i][j]));
@@ -70,6 +104,7 @@ function renderBoard(): void {
 function init(): void {
   const resetButton = document.getElementById("reset");
   if (!resetButton) throw new Error("No Reset button");
+  // if (!statusElement) throw new Error("No status element");
   resetButton.addEventListener("click", () => {
     boardState = [
       ["", "", ""],
@@ -77,6 +112,7 @@ function init(): void {
       ["", "", ""],
     ];
     currentMove = "X";
+    // statusElement.innerText = "";
     renderBoard();
   });
   renderBoard();
