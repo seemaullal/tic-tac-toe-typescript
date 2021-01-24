@@ -5,7 +5,7 @@ const boardElement = document.getElementById("board");
 const ROW_COUNT = 3;
 const COL_COUNT = 3;
 
-type Players = "X" | "Y";
+type Players = "X" | "O";
 type Cell = Players | "";
 
 type TicTacToeBoard = [
@@ -30,6 +30,20 @@ function createCell(
   cell.setAttribute("data-col", col.toString());
   cell.setAttribute("data-content", content);
   cell.classList.add("cell");
+  cell.addEventListener("click", () => {
+    let rowNumber: string | number | null = cell.getAttribute("data-row");
+    let colNumber: string | number | null = cell.getAttribute("data-col");
+    if (rowNumber === null || colNumber === null) {
+      return cell;
+    }
+    rowNumber = Number(rowNumber);
+    colNumber = Number(colNumber);
+    if (boardState[rowNumber][colNumber] === "") {
+      boardState[rowNumber][colNumber] = currentMove;
+      currentMove = currentMove === "X" ? "O" : "X";
+      renderBoard();
+    }
+  });
   return cell;
 }
 
