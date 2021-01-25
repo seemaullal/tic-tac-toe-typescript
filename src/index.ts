@@ -34,15 +34,8 @@ function createCell(
   cell.setAttribute("data-content", content);
   cell.classList.add("cell");
   cell.addEventListener("click", () => {
-    let rowNumber: string | number | null = cell.getAttribute("data-row");
-    let colNumber: string | number | null = cell.getAttribute("data-col");
-    if (rowNumber === null || colNumber === null) {
-      return cell;
-    }
-    rowNumber = Number(rowNumber);
-    colNumber = Number(colNumber);
-    if (boardState[rowNumber][colNumber] === "" && !winner && !draw) {
-      boardState[rowNumber][colNumber] = currentMove;
+    if (boardState[row][col] === "" && !winner && !draw) {
+      boardState[row][col] = currentMove;
       currentMove = currentMove === "X" ? "O" : "X";
       renderBoard();
     }
@@ -59,7 +52,7 @@ function getGameStatus(): string {
   let potentialDraw: boolean = true;
   for (let i = 0; i < ROW_COUNT; i++) {
     if (
-      boardState[i][0] == "" ||
+      boardState[i][0] === "" ||
       boardState[i][1] === "" ||
       boardState[i][2] === ""
     ) {
@@ -69,9 +62,35 @@ function getGameStatus(): string {
       boardState[i][1] === boardState[i][2]
     ) {
       winner = boardState[i][0];
+      return `${winner} wins!`;
+    }
+    if (
+      boardState[0][i] !== "" &&
+      boardState[0][i] === boardState[1][i] &&
+      boardState[1][i] === boardState[2][i]
+    ) {
+      console.log("here");
+      winner = boardState[0][i];
+      return `${winner} wins!`;
     }
   }
-  if (winner) return `${winner} wins!`;
+
+  if (
+    boardState[0][0] !== "" &&
+    boardState[0][0] === boardState[1][1] &&
+    boardState[1][1] === boardState[2][2]
+  ) {
+    winner = boardState[0][0];
+    return `${winner} wins!`;
+  }
+  if (
+    boardState[0][2] !== "" &&
+    boardState[0][2] === boardState[1][1] &&
+    boardState[1][1] === boardState[2][0]
+  ) {
+    winner = boardState[0][2];
+    return `${winner} wins!`;
+  }
   if (potentialDraw) {
     draw = true;
     return "Draw";
@@ -112,7 +131,8 @@ function init(): void {
       ["", "", ""],
     ];
     currentMove = "X";
-    // statusElement.innerText = "";
+    winner = undefined;
+    draw = false;
     renderBoard();
   });
   renderBoard();
