@@ -8,6 +8,7 @@ const COL_COUNT = 3;
 
 type Players = "X" | "O";
 type Cell = Players | "";
+type Winner = Cell | undefined;
 
 type TicTacToeBoard = [
   [Cell, Cell, Cell],
@@ -20,7 +21,7 @@ let boardState: TicTacToeBoard = [
   ["", "", ""],
 ];
 let currentMove: Players = "X";
-let winner: Cell | undefined;
+let winner: Winner;
 let draw: boolean = false;
 
 function createCell(
@@ -43,9 +44,42 @@ function createCell(
   return cell;
 }
 
+function checkRowWinner(rowNumber: number): boolean {
+  return (
+    boardState[rowNumber][0] !== "" &&
+    boardState[rowNumber][0] === boardState[rowNumber][1] &&
+    boardState[rowNumber][1] === boardState[rowNumber][2]
+  );
+}
+
+function checkColumnWinner(colNumber: number): boolean {
+  return (
+    boardState[0][colNumber] !== "" &&
+    boardState[0][colNumber] === boardState[1][colNumber] &&
+    boardState[1][colNumber] === boardState[2][colNumber]
+  );
+}
+
+function checkDiagonalWinner(): Winner {
+  if (
+    boardState[0][0] !== "" &&
+    boardState[0][0] === boardState[1][1] &&
+    boardState[1][1] === boardState[2][2]
+  ) {
+    return boardState[0][0];
+  }
+  if (
+    boardState[0][2] !== "" &&
+    boardState[0][2] === boardState[1][1] &&
+    boardState[1][1] === boardState[2][0]
+  ) {
+    return boardState[0][2];
+  }
+}
+
 function getGameStatus(): string {
   if (winner) {
-    return `${winner} wins!`;
+    return `${winner} wins!` as const;
   } else if (draw) {
     return "Draw";
   }
@@ -57,40 +91,23 @@ function getGameStatus(): string {
       boardState[i][2] === ""
     ) {
       potentialDraw = false;
-    } else if (
-      boardState[i][0] === boardState[i][1] &&
-      boardState[i][1] === boardState[i][2]
-    ) {
+    }
+    if (checkRowWinner(i)) {
       winner = boardState[i][0];
       return `${winner} wins!`;
     }
-    if (
-      boardState[0][i] !== "" &&
-      boardState[0][i] === boardState[1][i] &&
-      boardState[1][i] === boardState[2][i]
-    ) {
-      console.log("here");
+    if (checkColumnWinner(i)) {
       winner = boardState[0][i];
       return `${winner} wins!`;
     }
   }
+  const diagonalWinner: Winner = checkDiagonalWinner();
+  if (diagonalWinner) {
+    console.log(107);
+    winner = diagonalWinner;
+    return `${diagonalWinner} wins!` as const;
+  }
 
-  if (
-    boardState[0][0] !== "" &&
-    boardState[0][0] === boardState[1][1] &&
-    boardState[1][1] === boardState[2][2]
-  ) {
-    winner = boardState[0][0];
-    return `${winner} wins!`;
-  }
-  if (
-    boardState[0][2] !== "" &&
-    boardState[0][2] === boardState[1][1] &&
-    boardState[1][1] === boardState[2][0]
-  ) {
-    winner = boardState[0][2];
-    return `${winner} wins!`;
-  }
   if (potentialDraw) {
     draw = true;
     return "Draw";
